@@ -38,24 +38,30 @@ def parseJson(json_file):
                 #print "new business"
                 business_list.append(data)
 
-        print "The length of user_list is: %d" % len(user_list)
-        print "The length of review_dict is %d" % len(review_list)
-        print "The length of the business_dict is %d" % len(business_list)
-
-        print "done"
-
 
 def initializeGraph():
     YGraph = nx.Graph()
     for user in user_list:
-        "adding new user node!"
+        # print "adding new user node!"
+        """
+        NOTE:
+        ---------------------------------------------------------------------
+        Added a "u" before the traditional user_id as they were not unique
+        from the business_id's
+        """
         YGraph.add_node("u"+user['user_id'], type="user")
     for business in business_list:
-        "adding new business node!"
+        # print "adding new business node!"
+        """
+        NOTE:
+        ---------------------------------------------------------------------
+        Added a "b" before the traditional business_id as they were not unique
+        from the user_id's
+        """
         YGraph.add_node("b"+business['business_id'], type="business")
-    #print "The number of nodes in the graph is: %d" % YGraph.number_of_nodes()
+    # print "The number of nodes in the graph is: %d" % YGraph.number_of_nodes()
     for review in review_list:
-        print "adding a new review"
+        # print "adding a new review"
         user_id = review['user_id']
         business_id = review['business_id']
         YGraph.add_edge("u"+user_id, "b"+business_id, weight=review['stars'])
