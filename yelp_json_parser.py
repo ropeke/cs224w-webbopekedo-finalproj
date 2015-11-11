@@ -10,13 +10,14 @@ Modified: 11/11/2015
 
 import sys
 import json
+import networkx as nx
 from re import sub
 
 columnSeparator = "|"
-user_dict = dict()
+user_list = list()
 # The key here is business_id+user_id
-review_dict = dict()
-business_dict = dict()
+review_list = list()
+business_list = list()
 
 # Dictionary of months used for date transformation
 MONTHS = {'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06',\
@@ -68,17 +69,18 @@ def parseJson(json_file):
             data = json.loads(line)
             if data['type'] == 'user':
                 print "new user!"
-                user_dict['user_id'] = data
+                user_list.append(data)
             if data['type'] == 'review':
                 print "new review"
-                review_dict['review_id'] = data
+                review_list.append(data)
             if data['type'] == 'business':
                 print "new business"
-                business_dict['business_id'] = data
+                business_list.append(data)
 
-        print "The length of user_dict is: %d" % len(user_dict)
-        print "The length of review_dict is %d" % len(review_dict)
-        print "The length of the business_dict is %d" % len(business_dict)
+        print "The length of user_list is: %d" % len(user_list)
+        print "The length of review_dict is %d" % len(review_list)
+        print "The length of the business_dict is %d" % len(business_list)
+
         print "done"
 
 """
