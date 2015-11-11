@@ -4,24 +4,8 @@ FILE: skeleton_parser.py
 ------------------
 Author: Firas Abuzaid (fabuzaid@stanford.edu)
 Author: Perth Charernwattanagul (puch@stanford.edu)
-Modified: 04/21/2014
-
-Skeleton parser for CS145 programming project 1. Has useful imports and
-functions for parsing, including:
-
-1) Directory handling -- the parser takes a list of eBay json files
-and opens each file inside of a loop. You just need to fill in the rest.
-2) Dollar value conversions -- the json files store dollar value amounts in
-a string like $3,453.23 -- we provide a function to convert it to a string
-like XXXXX.xx.
-3) Date/time conversions -- the json files store dates/ times in the form
-Mon-DD-YY HH:MM:SS -- we wrote a function (transformDttm) that converts to the
-for YYYY-MM-DD HH:MM:SS, which will sort chronologically in SQL.
-
-Your job is to implement the parseJson function, which is invoked on each file by
-the main function. We create the initial Python dictionary object of items for
-you; the rest is up to you!
-Happy parsing!
+Modifier: Rotimi Opeke (ropeke@stanford.edu)
+Modified: 11/11/2015
 """
 
 import sys
@@ -29,6 +13,10 @@ import json
 from re import sub
 
 columnSeparator = "|"
+user_dict = dict()
+# The key here is business_id+user_id
+review_dict = dict()
+business_dict = dict()
 
 # Dictionary of months used for date transformation
 MONTHS = {'Jan':'01','Feb':'02','Mar':'03','Apr':'04','May':'05','Jun':'06',\
@@ -78,103 +66,20 @@ def parseJson(json_file):
         print "starting to load json file!"
         for line in f:
             data = json.loads(line)
-            print type(data)
-            if data['type'] = 'user':
-                #populate the user
-            if data['type'] = 'review'
-                #populate the information for the review
-            if data['type'] = 'business'
-                #populate the information for the business
+            if data['type'] == 'user':
+                print "new user!"
+                user_dict['user_id'] = data
+            if data['type'] == 'review':
+                print "new review"
+                review_dict['review_id'] = data
+            if data['type'] == 'business':
+                print "new business"
+                business_dict['business_id'] = data
 
+        print "The length of user_dict is: %d" % len(user_dict)
+        print "The length of review_dict is %d" % len(review_dict)
+        print "The length of the business_dict is %d" % len(business_dict)
         print "done"
-
-        # category = open('category.dat', 'a')
-        # bids = open('bid.dat', 'a')
-        # auctions = open('auction.dat', 'a')
-        # users = open('user.dat', 'a')
-        #
-        # for item in items:
-        #     # for auctions
-        #     auction_table_extract = ""
-        #     item_id = item['ItemID']
-        #
-        #     seller_id = item['Seller']['UserID']
-        #     seller_id = seller_id.replace('"', '""')
-        #     seller_id = '"'+seller_id+'"'
-        #
-        #     name = item['Name']
-        #     name = name.replace('"', '""')
-        #     name = '"'+name+'"'
-        #
-        #     start_time = '"'+transformDttm(item['Started'])+'"'
-        #     end_time = '"'+transformDttm(item['Ends'])+'"'
-        #
-        #     description = item['Description']
-        #     if (description is None):
-        #         description = 'NULL'
-        #         description = '"'+description+'"'
-        #     if (description != '""'):
-        #         description = description.replace('"','""')
-        #         description = '"'+description+'"'
-        #     current_price = '"'+transformDollar(item['Currently'])+'"'
-        #     first_bid = '"'+transformDollar(item['First_Bid'])+'"'
-        #     num_bids = item.get('Number_of_Bids', "NULL")
-        #     buy_price = item.get('Buy_Price', 'NULL')
-        #     if (buy_price != 'NULL'):
-        #         buy_price = transformDollar(buy_price)
-        #     else:
-        #         buy_price = 'NULL'
-        #     buy_price = '"'+buy_price+'"'
-        #
-        #     auction_table_extract += (item_id+columnSeparator+seller_id+columnSeparator+name+columnSeparator+start_time+columnSeparator+end_time+columnSeparator+description+columnSeparator+current_price+columnSeparator+first_bid+columnSeparator+num_bids+columnSeparator+buy_price+"\n")
-        #
-        #     # for bids
-        #     bid_length = 0
-        #     if (num_bids != "0"):
-        #         bid_length = len(item['Bids'])
-        #
-        #     buying_table_extract = ""
-        #     for i in range(0, bid_length):
-        #         buyer_id = item['Bids'][i]['Bid']['Bidder']['UserID']
-        #         buyer_id = buyer_id.replace('"', '""')
-        #         buyer_id = '"'+buyer_id+'"'
-        #         bid_time = '"'+transformDttm(item['Bids'][i]['Bid']['Time'])+'"'
-        #         bid_amount = '"'+transformDollar(item['Bids'][i]['Bid']['Amount'])+'"'
-        #         buying_table_extract += (item_id+columnSeparator+buyer_id+columnSeparator+bid_time+columnSeparator+bid_amount+"\n")
-        #
-        #     # for category
-        #     category_table_extract = ""
-        #     category_length = len(item['Category'])
-        #     for i in range(0, category_length):
-        #         category_entry = item['Category'][i]
-        #         category_entry = '"'+category_entry+'"'
-        #         category_table_extract += (item_id+columnSeparator+category_entry+"\n")
-        #
-        #     # for users
-        #     users_table_extract = ""
-        #     seller_rating = item['Seller']['Rating']
-        #     seller_location = item['Location']
-        #     seller_location = '"'+seller_location+'"'
-        #     seller_country = item['Country']
-        #     seller_country = '"'+seller_country+'"'
-        #     users_table_extract += (seller_id+columnSeparator+seller_rating+columnSeparator+seller_location+columnSeparator+seller_country+"\n")
-        #
-        #     for i in range(0, bid_length):
-        #         buyer_id = item['Bids'][i]['Bid']['Bidder']['UserID']
-        #         buyer_id = buyer_id.replace('"', '""')
-        #         buyer_id = '"'+buyer_id+'"'
-        #         buyer_rating = item['Bids'][i]['Bid']['Bidder']['Rating']
-        #         buyer_location = item['Bids'][i]['Bid']['Bidder'].get('Location', "NULL")
-        #         buyer_location = '"'+buyer_location+'"'
-        #         buyer_country = item['Bids'][i]['Bid']['Bidder'].get('Country', "NULL")
-        #         buyer_country = '"'+buyer_country+'"'
-        #         users_table_extract += (buyer_id+columnSeparator+buyer_rating+columnSeparator+buyer_location+columnSeparator+buyer_country+"\n")
-        #
-        #
-        #     bids.write(buying_table_extract)
-        #     category.write(category_table_extract)
-        #     auctions.write(auction_table_extract)
-        #     users.write(users_table_extract)
 
 """
 Loops through each json files provided on the command line and passes each file
