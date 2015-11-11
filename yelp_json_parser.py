@@ -68,13 +68,13 @@ def parseJson(json_file):
         for line in f:
             data = json.loads(line)
             if data['type'] == 'user':
-                print "new user!"
+                #print "new user!"
                 user_list.append(data)
             if data['type'] == 'review':
-                print "new review"
+                #print "new review"
                 review_list.append(data)
             if data['type'] == 'business':
-                print "new business"
+                #print "new business"
                 business_list.append(data)
 
         print "The length of user_list is: %d" % len(user_list)
@@ -82,6 +82,20 @@ def parseJson(json_file):
         print "The length of the business_dict is %d" % len(business_list)
 
         print "done"
+
+
+def initializeGraph():
+    YGraph = nx.Graph()
+    for user in user_list:
+        "adding new user node!"
+        YGraph.add_node(user['user_id'], type="user")
+    for business in business_list:
+        "adding new business node!"
+        YGraph.add_node(business['business_id']+business['name'], type="business")
+    #print "The number of nodes in the graph is: %d" % YGraph.number_of_nodes()
+    for review in review_list:
+        "adding a new review" 
+
 
 """
 Loops through each json files provided on the command line and passes each file
@@ -96,6 +110,7 @@ def main(argv):
         if isJson(f):
             parseJson(f)
             print "Success parsing " + f
+    initializeGraph()
 
 if __name__ == '__main__':
     main(sys.argv)
