@@ -72,12 +72,10 @@ def calculateSimilarities():
         friends = friendship_map[user]
         for friend in friends:
             pair_map[(user, friend)] = similarity_friendship_overlap(user, friend)
-            """
             if friend in friendship_map:
                 friend_friends = friendship_map[friend]
                 for friend_friend in friend_friends:
-                    pair_map[(user, friend_friend)] = 2
-            """
+                    pair_map[(user, friend_friend)] = similarity_friendship_overlap(user, friend_friend)
 
 
 """
