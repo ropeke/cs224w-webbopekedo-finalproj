@@ -14,26 +14,15 @@ import networkx as nx
 from re import sub
 
 columnSeparator = "|"
-friendship_map = {}
+raw_friendship_map = {} # unsanitized friendship map including dead nodes
+friendship_map = {} # sanitized friendship map 
 user_map = {}
 review_map = {}
 business_map = {}
 pair_map = {}
 
-
-state_review_list = []
-state_business_list = []
-state_user_list = []
-state_business_set = set()
-state_review_map = {}
-state_user_map = {}
-
 user_pair_similarity = {}
 
-PRUNE_STATE = 'PA'
-
-# Number k of most similar nodes ot consider
-k = 5
 #The graph
 YGraph = nx.Graph()
 
@@ -44,26 +33,33 @@ item in the data set.
 def parseJson(json_file):
     with open(json_file, 'r') as f:
         print "starting to load json file!"
+        num_edges = 0
         for line in f:
             data = json.loads(line)
-            if data['type'] == 'user':
+            if data['type'] == 'user' and len(data['friends']) > 5:
                 user_map[data['user_id']] = data
-                friendship_map[data['user_id']] = data['friends']
+                raw_friendship_map[data['user_id']] = data['friends']
+                num_edges += len(data['friends'])
             if data['type'] == 'review':
                 review_map[(data['user_id'], data['business_id'])] = data
             if data['type'] == 'business':
                 business_map[data['business_id']] = data
 
-    print len(user_map)
+    print len(raw_friendship_map)
+    print num_edges * 1.0 / len(raw_friendship_map)
 
 
 def initializeGraph():
-    for user in friendship_map:
+    print "initializeGraph()"
+    for user in raw_friendship_map:
         YGraph.add_node(user, type="user")
-        friends = friendship_map[user] 
+        if user not in friendship_map:
+            friendship_map[user] = []
+        friends = raw_friendship_map[user] 
         for friend in friends:
-            if friend in friendship_map:
+            if friend in raw_friendship_map:
                 YGraph.add_edge(user, friend)
+                friendship_map[user].append(friend)
 
     print len(friendship_map)
     print "The number of nodes in the graph is: %d" % YGraph.number_of_nodes()
@@ -119,13 +115,9 @@ def main(argv):
         parseJson(f)
         print "Success parsing " + f
 
-    # pruneData()
     initializeGraph()
     calculateSimilarities()
     print len(pair_map) * 1.0 / len(friendship_map)
-    ##### CONTINUE CODING FROM HERE! ######
-
-
 
 if __name__ == '__main__':
     main(sys.argv)
