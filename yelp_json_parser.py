@@ -12,6 +12,7 @@ import sys
 import json
 import networkx as nx
 from re import sub
+import cPickle as pickle
 
 columnSeparator = "|"
 raw_friendship_map = {} # unsanitized friendship map including dead nodes
@@ -33,7 +34,7 @@ item in the data set.
 """
 def parseJson(json_file):
     with open(json_file, 'r') as f:
-        print "parseJson()"
+        print 'Parsing', json_file + '...'
         num_edges = 0
         for line in f:
             data = json.loads(line)
@@ -73,39 +74,41 @@ def initializeGraph():
     print "Total size: %d" % total_size
 
 
-"""
-calculateSimilarities - Calculated the similarities between pairs of nodes. We take all pairs of friends of friends to calculate similarities for
-"""
-def calculateSimilarities():
-    print "calculateSimilarities()"
-    for user in friendship_map:
-        friends = friendship_map[user]
-        for friend in friends:
-            pair_map[(user, friend)] = similarityFriendshipOverlap(user, friend)
-            if friend in friendship_map:
-                friend_friends = friendship_map[friend]
-                for friend_friend in friend_friends:
-                    if (user, friend_friend) not in pair_map:
-                        pair_map[(user, friend_friend)] = similarityFriendshipOverlap(user, friend_friend)
+# """
+# calculateSimilarities - Calculated the similarities between pairs of nodes. We take all pairs of friends of friends to calculate similarities for
+# """
+# def calculateSimilarities():
+#     print "calculateSimilarities()"
+#     # loop through friends
+#     for user in friendship_map:
+#         friends = friendship_map[user]
+#         for friend in friends:
+#             pair_map[(user, friend)] = similarityFriendshipOverlap(user, friend)
+#             if friend in friendship_map:
+#                 # loop through friends of friends
+#                 friend_friends = friendship_map[friend]
+#                 for friend_friend in friend_friends:
+#                     if (user, friend_friend) not in pair_map:
+#                         pair_map[(user, friend_friend)] = similarityFriendshipOverlap(user, friend_friend)
 
-    print "Number of pairs: %d" % len(pair_map)
+#     print "Number of pairs: %d" % len(pair_map)
 
 
-"""
-similarityFriendshipOverlap - Finds the similaritiy of two nodes by comparing the 
-fraction of their friends that overlap
-"""
-def similarityFriendshipOverlap(node1, node2):
-    if node1 not in friendship_map or node2 not in friendship_map:
-        return 0
+# """
+# similarityFriendshipOverlap - Finds the similaritiy of two nodes by comparing the 
+# fraction of their friends that overlap
+# """
+# def similarityFriendshipOverlap(node1, node2):
+#     if node1 not in friendship_map or node2 not in friendship_map:
+#         return 0
 
-    friends1 = frozenset(friendship_map[node1])
-    friends2 = frozenset(friendship_map[node2])
+#     friends1 = frozenset(friendship_map[node1])
+#     friends2 = frozenset(friendship_map[node2])
 
-    overlap = friends1.intersection(friends2)
-    union = friends1.union(friends2)
+#     overlap = friends1.intersection(friends2)
+#     union = friends1.union(friends2)
 
-    return len(overlap) * 1.0 / len(union)
+#     return len(overlap) * 1.0 / len(union)
 
 
 def processReviews():
@@ -120,26 +123,55 @@ def processReviews():
 
     print "Number of businesses reviewed: %d" % len(business_reviews)
 
+def loadFromFile():
+    try:
+        f1 = open( "friendshipMap.p", "rb" )
+        friendship_map = pickle.load(f1)
+        f1.close()
+        f2 = open( "businessReviews.p", "rb" )
+        business_reviews = pickle.load(f2)
+        f2.close()
+    except IOError as e:
+        sys.stderr.write("I/O error({0}): {1}".format(e.errno, e.strerror)+'\n')
+        sys.stderr.write('Try running with -buildClean = clean!\n')
 
-def main(argv):
-    if len(argv) < 2:
-        print >> sys.stderr, 'Usage: python skeleton_json_parser.py <path to json files>'
-        sys.exit(1)
+
+
+    return (friendship_map, business_reviews)
+
+
+"""
+instead of calling this from the command-line,
+this method will now be called from RunYelpPredictor.py
+"""
+# UPDATE by James: now called by RunYelpPredictor, returns values, separate from similarity
+def parseJsons(businessJson='pa_business.json', reviewJson='pa_review.json', userJson='pa_user.json'):
     # loops over all .json files in the argument
-    for f in argv[1:]:
-        parseJson(f)
-        print "Success parsing " + f
+    parseJson(businessJson)
+    print "Success parsing " + businessJson
+    parseJson(reviewJson)
+    print "Success parsing " + reviewJson
+    parseJson(userJson)
+    print "Success parsing " + userJson
 
     # we won't need the graph for the first part
-    # initializeGraph()
-
-    # similarities are in the global pair_map
-    calculateSimilarities() 
+    # UPDATE by James: initialized because needed to populate friendship_map
+    initializeGraph()
 
     # business reviews are in the global business_reviews
     processReviews()
 
-    # Continue Coding Here
+    pickle.dump(friendship_map, open( "friendshipMap.p", "wb" ) )
+    pickle.dump(business_reviews, open( "businessReviews.p", "wb" ) )
 
-if __name__ == '__main__':
-    main(sys.argv)
+    return (friendship_map, business_reviews)
+
+
+
+
+    # similarities are in the global pair_map
+    # calculateSimilarities() 
+
+    
+
+    # Continue Coding Here

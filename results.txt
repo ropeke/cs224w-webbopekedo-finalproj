@@ -1,0 +1,51 @@
+###############################
+#       ERROR ANALYSIS        #
+###############################
+Similarity Measure: FriendshipOverlap
+Predictor: RandomRegressor
+Mean Square Error = 3.42864236072
+Error Histogram (prediction - observed):
+Error 	Count
+-4 		2767
+-3 		8106
+-2 		12047
+-1 		14131
+0 		12641
+1 		8031
+2 		3960
+3 		1926
+4 		620
+Confusion Matrix (predicted rows[1:5], observed cols[1:5]):
+	1		2		3		4		5
+1	638		750		1231	2593	2767
+2	1256	1554	2583	5202	5513
+3	1202	1578	2528	5272	5614
+4	1156	1529	2594	5166	5526
+5	620		770		1229	2603	2755
+
+
+
+###############################
+#       ERROR ANALYSIS        #
+###############################
+Similarity Measure: FriendshipOverlap
+Predictor: KNNRegressor
+Mean Square Error = 2.57324714229
+Error Histogram (prediction - observed):
+Error 	Count
+-4 		1855
+-3 		5054
+-2 		8188
+-1 		15450
+0 		17610
+1 		9555
+2 		4195
+3 		1801
+4 		521
+Confusion Matrix (predicted rows[1:5], observed cols[1:5]):
+	1		2		3		4		5
+1	563		498		593		1350	1855
+2	1103	1136	1401	2877	3688
+3	1386	2018	3254	5066	4618
+4	1299	2027	4135	9244	8358
+5	521		502		782		2299	3656
