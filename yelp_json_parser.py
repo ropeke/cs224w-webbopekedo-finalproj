@@ -20,11 +20,12 @@ user_map = {}
 review_map = {}
 business_map = {}
 pair_map = {}
-
-user_pair_similarity = {}
+business_reviews = {}
 
 #The graph
 YGraph = nx.Graph()
+
+MIN_EDGES = 5
 
 """
 Parses a single json file. Currently, there's a loop that iterates over each
@@ -32,11 +33,11 @@ item in the data set.
 """
 def parseJson(json_file):
     with open(json_file, 'r') as f:
-        print "starting to load json file!"
+        print "parseJson()"
         num_edges = 0
         for line in f:
             data = json.loads(line)
-            if data['type'] == 'user' and len(data['friends']) > 5:
+            if data['type'] == 'user' and len(data['friends']) > MIN_EDGES:
                 user_map[data['user_id']] = data
                 raw_friendship_map[data['user_id']] = data['friends']
                 num_edges += len(data['friends'])
@@ -44,9 +45,6 @@ def parseJson(json_file):
                 review_map[(data['user_id'], data['business_id'])] = data
             if data['type'] == 'business':
                 business_map[data['business_id']] = data
-
-    print len(raw_friendship_map)
-    print num_edges * 1.0 / len(raw_friendship_map)
 
 
 def initializeGraph():
@@ -61,28 +59,43 @@ def initializeGraph():
                 YGraph.add_edge(user, friend)
                 friendship_map[user].append(friend)
 
-    print len(friendship_map)
     print "The number of nodes in the graph is: %d" % YGraph.number_of_nodes()
     print "The number of edges in the graph is: %d" % YGraph.number_of_edges()
-    print YGraph.number_of_edges() * 1.0 / YGraph.number_of_nodes()
+    print "Density: %f" % (YGraph.number_of_edges() * 1.0 / YGraph.number_of_nodes())
+
+    print "Finding Communities"
+    communities = list(nx.k_clique_communities(YGraph, 7))
+    print "Number of communities: %d" % len(communities)
+    total_size = 0
+    for c in communities:
+        print len(c)
+        total_size += len(c)
+    print "Total size: %d" % total_size
 
 
+"""
+calculateSimilarities - Calculated the similarities between pairs of nodes. We take all pairs of friends of friends to calculate similarities for
+"""
 def calculateSimilarities():
+    print "calculateSimilarities()"
     for user in friendship_map:
         friends = friendship_map[user]
         for friend in friends:
-            pair_map[(user, friend)] = similarity_friendship_overlap(user, friend)
+            pair_map[(user, friend)] = similarityFriendshipOverlap(user, friend)
             if friend in friendship_map:
                 friend_friends = friendship_map[friend]
                 for friend_friend in friend_friends:
-                    pair_map[(user, friend_friend)] = similarity_friendship_overlap(user, friend_friend)
+                    if (user, friend_friend) not in pair_map:
+                        pair_map[(user, friend_friend)] = similarityFriendshipOverlap(user, friend_friend)
+
+    print "Number of pairs: %d" % len(pair_map)
 
 
 """
-similarity_friendship_overlap - Finds the similaritiy of two nodes by comparing the 
+similarityFriendshipOverlap - Finds the similaritiy of two nodes by comparing the 
 fraction of their friends that overlap
 """
-def similarity_friendship_overlap(node1, node2):
+def similarityFriendshipOverlap(node1, node2):
     if node1 not in friendship_map or node2 not in friendship_map:
         return 0
 
@@ -95,13 +108,17 @@ def similarity_friendship_overlap(node1, node2):
     return len(overlap) * 1.0 / len(union)
 
 
-"""
-find_k_most_similar - Finds the k most similar nodes to a given node. Will be extended to support different measures of similarity
-"""
-def find_k_most_similar(YGraph, node):
-    friends = YGraph.neighbors(node)
-    sorted_friends = sorted(friends, key=lambda friend: YGraph[node][friend]['friendship_overlap'], reverse=True)
-    return sorted_friends[0:k] 
+def processReviews():
+    print "processReviews()"
+    for (user_id, business_id), review in review_map.iteritems():
+        if business_id not in business_reviews:
+            business_reviews[business_id] = []
+        
+        user_rating = review['stars']
+        review_entry = (user_id, user_rating)
+        business_reviews[business_id].append(review_entry)
+
+    print "Number of businesses reviewed: %d" % len(business_reviews)
 
 
 def main(argv):
@@ -113,9 +130,16 @@ def main(argv):
         parseJson(f)
         print "Success parsing " + f
 
-    initializeGraph()
-    calculateSimilarities()
-    print len(pair_map) * 1.0 / len(friendship_map)
+    # we won't need the graph for the first part
+    # initializeGraph()
+
+    # similarities are in the global pair_map
+    calculateSimilarities() 
+
+    # business reviews are in the global business_reviews
+    processReviews()
+
+    # Continue Coding Here
 
 if __name__ == '__main__':
     main(sys.argv)
