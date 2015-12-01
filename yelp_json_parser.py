@@ -124,6 +124,9 @@ def processReviews():
     print "Number of businesses reviewed: %d" % len(business_reviews)
 
 def loadFromFile():
+    """
+    To save time, loads desired information from file
+    """
     try:
         f1 = open( "friendshipMap.p", "rb" )
         friendship_map = pickle.load(f1)
@@ -135,17 +138,25 @@ def loadFromFile():
         sys.stderr.write("I/O error({0}): {1}".format(e.errno, e.strerror)+'\n')
         sys.stderr.write('Try running with -buildClean = clean!\n')
 
-
-
     return (friendship_map, business_reviews)
 
 
-"""
-instead of calling this from the command-line,
-this method will now be called from RunYelpPredictor.py
-"""
 # UPDATE by James: now called by RunYelpPredictor, returns values, separate from similarity
 def parseJsons(businessJson='pa_business.json', reviewJson='pa_review.json', userJson='pa_user.json'):
+    """
+    Extracts desired information from the provided Yelp jsons.
+
+    Keyword arguments:
+    businessJson -- json storing business relations (default: 'pa_business.json')
+    reviewJson   -- json storing ratings of businesses by userJson (default: 'pa_review.json')
+    userJson     -- json storing user relations (default: 'pa_user.json')
+
+    Return value:
+    a tuple of:
+        friendship_map   -- map of user id -> list of user ids of friends
+        business_reviews -- map of business id -> list of (user id of user that rated business, rating) tuples
+    """
+
     # loops over all .json files in the argument
     parseJson(businessJson)
     print "Success parsing " + businessJson

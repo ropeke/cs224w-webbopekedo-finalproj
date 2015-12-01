@@ -1,8 +1,28 @@
+"""
+FILE: RegressorUtil.py
+------------------
+Author: James Webb (jmwebb@stanford.edu)
+Created: 11/15/2015
+"""
+
 import math
 from Prediction import Prediction
 import numpy as np
 
 def runRegressor(similarityScores, businessToRaters, predictor):
+	"""
+	Runs all trials of the regressor, predicting a rating for every
+	business-user pair. Note that ratings are only predicted for
+	instances where a user actually rated the business.
+
+	Keyword arguments:
+	similarityScores -- map of user id -> list of (user id of similar user, similarity score) tuples
+	businessToRaters -- map of business id -> list of (user id of user that rated business, rating) tuples
+	predictor        -- prediction (regression) model
+
+	Return value:
+	a list of Prediction objects for each business-user pair
+	"""
 
 	# Final result storing all prediction objects, will be used to evaluate results
 	predictions = list()
@@ -25,7 +45,15 @@ def runRegressor(similarityScores, businessToRaters, predictor):
 	return predictions
 
 def evaluateRegressor(predictions, predictor, similarityMeasure):
+	"""
+	Evaluates the accuracy of the predictions and reports error statistics.
 
+	Keyword arguments:
+	predictions       -- a list of Prediction objects for each business-user pair
+	predictor         -- prediction (regression) model
+	similarityMeasure -- the selected similarity measure used in predictions
+
+	"""
 	# Evaluate system with error metrics
 
 	errorSquareSum = 0.0
@@ -42,7 +70,6 @@ def evaluateRegressor(predictions, predictor, similarityMeasure):
 
 	meanSquareError = errorSquareSum / len(predictions)
 
-	# TODO: Add confusion matrix
 
 	# Print error metrics
 	print '###############################'
