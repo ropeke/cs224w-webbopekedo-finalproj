@@ -42,7 +42,7 @@ Run with parameters in this order:
 -predictionModel: 		[baseline, knn]					--	model for predicting ratings
 -trials: 				[0 to totalTrials]				--	integer number of trial results to print
 -(optional) buildClean:	[clean]							--	repopulates globals from json files
-															otherwise loads from .bin	
+															otherwise loads from .bin
 """
 def main(argv):
 	# Set default values
@@ -95,6 +95,8 @@ def main(argv):
 
 	friendshipMap = yelpData[0]
 	businessReviews = yelpData[1]
+	if buildClean:
+			yelpGraph = yelpData[2]
 
 	# Create appropriate similarity measure (with necessary yelp data) and
 	# either calculate similarities from scratch (buildClean == True) or
@@ -103,7 +105,9 @@ def main(argv):
 	if argv[1] == 'foverlap':
 		similarityMeasure = FriendshipOverlapSimilarity(friendshipMap)
 	elif argv[1] == 'community':
-		similarityMeasure = CommunitySimilarity()
+		print "this is not breaking as of yet - testing the ability to pass the networkX graph through"
+		print type(yelpGraph)
+		similarityMeasure = CommunitySimilarity(yelpGraph)
 	elif argv[1] == 'commute':
 		similarityMeasure = CommuteTimeSimilarity()
 	if buildClean:
@@ -132,4 +136,3 @@ def main(argv):
 
 if __name__ == "__main__":
 	main(sys.argv)
-
