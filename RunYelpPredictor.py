@@ -13,9 +13,10 @@ import RegressorUtil
 from FriendshipOverlapSimilarity import FriendshipOverlapSimilarity
 from CommunitySimilarity import CommunitySimilarity
 from CommuteTimeSimilarity import CommuteTimeSimilarity
+from PageRankSimilarity import PageRankSimilarity
 
 # Valid values for arguments
-similarityMeasureStrings = ['foverlap','community','commute']
+similarityMeasureStrings = ['foverlap','community','commute','pagerank']
 predicitonModelStrings = ['baseline','knn']
 
 def printArgsHelp():
@@ -37,7 +38,7 @@ Part 3: Evaluate results
 Run with parameters in this order:
 -(optional) help: 		[help]							--	prints argument instructions for
 															RunYelpPredictor and exits
--similarityMeasure: 	[foverlap, community, commute] 	-- 	calculates similarity between nodes
+-similarityMeasure: 	[foverlap, community, commute, pagerank] 	-- 	calculates similarity between nodes
 															using this measurment
 -predictionModel: 		[baseline, knn]					--	model for predicting ratings
 -trials: 				[0 to totalTrials]				--	integer number of trial results to print
@@ -100,17 +101,25 @@ def main(argv):
 	# either calculate similarities from scratch (buildClean == True) or
 	# load similarities from file (buildClean == False)
 	similarityScores = dict()
+
 	if argv[1] == 'foverlap':
 		similarityMeasure = FriendshipOverlapSimilarity(friendshipMap)
 	elif argv[1] == 'community':
 		similarityMeasure = CommunitySimilarity()
 	elif argv[1] == 'commute':
 		similarityMeasure = CommuteTimeSimilarity()
+	elif argv[1] == 'pagerank':
+		similarityMeasure = PageRankSimilarity(friendshipMap)
+
+	
 	if buildClean:
 		similarityMeasure.calculateSimilarities()
 	else:
 		similarityMeasure.loadFromFile()
-	similarityScores = similarityMeasure.similarities
+	
+	similarityMeasure.calculateSimilarities()
+
+	print len(similarityScores)
 
 	# Create appropriate prediction model and
 	# generate list of predictions
@@ -127,7 +136,6 @@ def main(argv):
 	# Once all the predictions have been calculated, we evaluate the accuracy of
 	# our system and report error statistics
 	RegressorUtil.evaluateRegressor(predictions, predictionModel, similarityMeasure)
-
 
 
 if __name__ == "__main__":
