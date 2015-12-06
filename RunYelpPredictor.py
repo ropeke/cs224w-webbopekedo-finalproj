@@ -117,7 +117,7 @@ def main(argv):
 	else:
 		similarityMeasure.loadFromFile()
 	
-	similarityMeasure.calculateSimilarities()
+	similarityScores = similarityMeasure.similarities
 
 	print len(similarityScores)
 
