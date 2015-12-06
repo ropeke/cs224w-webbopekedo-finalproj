@@ -23,7 +23,7 @@ state_review_map = {}
 state_user_map = {}
 state_business_map = {}
 
-PRUNE_STATE = 'NV'
+PRUNE_STATE = 'AZ'
 
 # Number k of most similar nodes ot consider
 k = 5
