@@ -111,18 +111,16 @@ def main(argv):
 	elif argv[1] == 'pagerank':
 		similarityMeasure = PageRankSimilarity(friendshipMap)
 
-	'''
+	
 	if buildClean:
 		similarityMeasure.calculateSimilarities()
 	else:
 		similarityMeasure.loadFromFile()
-	'''
+	
 	similarityMeasure.calculateSimilarities()
-	similarityScores = similarityMeasure.similarities
 
 	print len(similarityScores)
 
-	'''
 	# Create appropriate prediction model and
 	# generate list of predictions
 	if argv[2] == 'baseline':
@@ -138,7 +136,6 @@ def main(argv):
 	# Once all the predictions have been calculated, we evaluate the accuracy of
 	# our system and report error statistics
 	RegressorUtil.evaluateRegressor(predictions, predictionModel, similarityMeasure)
-	'''
 
 
 if __name__ == "__main__":
