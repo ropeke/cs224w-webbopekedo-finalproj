@@ -90,7 +90,7 @@ def main(argv):
 	# a map from business -> users who rated that business
 	# TODO: expand what yelp data contains as necessary for other sim measures
 	if buildClean:
-		yelpData = yelp_json_parser.parseJsons(businessJson='NV_business.json', reviewJson='NV_review.json', userJson='NV_user.json')
+		yelpData = yelp_json_parser.parseJsons()
 	else:
 		yelpData = yelp_json_parser.loadFromFile()
 
