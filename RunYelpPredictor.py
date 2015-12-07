@@ -16,13 +16,13 @@ from CommuteTimeSimilarity import CommuteTimeSimilarity
 from PageRankSimilarity import PageRankSimilarity
 
 # Valid values for arguments
-similarityMeasureStrings = ['foverlap','community','commute','pagerank']
+similarityMeasureStrings = ['foverlap','community','commute','pagerank','featureDist']
 predicitonModelStrings = ['baseline','knn']
 
 def printArgsHelp():
 	print '#arg_name#\t\t\t#arg_value#\t\t\t#arg_description#'
 	print '(optional) help:\t\t[help]\t\t\t\tprints argument instructions for RunYelpPredictor and exits'
-	print 'similarityMeasure:\t\t[foverlap, community, commute]\t\t\tcalculates similarity between nodes using this measurment'
+	print 'similarityMeasure:\t\t[foverlap, community, commute, pagerank, featureDist]\t\t\tcalculates similarity between nodes using this measurment'
 	print 'predictionModel:\t\t[baseline, knn]\t\t\tmodel for predicting ratings'
 	print 'trials:\t\t\t\t[0 to totalTrials]\t\tinteger number of trial results to print (default 0)'
 	print '(optional) buildClean:\t\t[clean]\t\t\t\trepopulates globals from json files otherwise loads from .bin (default False)'
@@ -38,7 +38,7 @@ Part 3: Evaluate results
 Run with parameters in this order:
 -(optional) help: 		[help]							--	prints argument instructions for
 															RunYelpPredictor and exits
--similarityMeasure: 	[foverlap, community, commute, pagerank] 	-- 	calculates similarity between nodes
+-similarityMeasure: 	[foverlap, community, commute, pagerank, featureDist] 	-- 	calculates similarity between nodes
 															using this measurment
 -predictionModel: 		[baseline, knn]					--	model for predicting ratings
 -trials: 				[0 to totalTrials]				--	integer number of trial results to print
@@ -116,6 +116,8 @@ def main(argv):
 		similarityMeasure = CommuteTimeSimilarity()
 	elif argv[1] == 'pagerank':
 		similarityMeasure = PageRankSimilarity(friendshipMap)
+	elif argv[1] == 'featureDist':
+		similarityMeasure = 
 
 	
 	if buildClean:
