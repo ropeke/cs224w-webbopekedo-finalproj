@@ -51,7 +51,9 @@ class KNNRegressor:
 						relevantSimilarities += similarityScores[userId][i][1]
 
 		# If no similar users to compare to, guess randomly
-		if relevantSimilarities == 0: return random.uniform(1, 5)
+		# if relevantSimilarities == 0: return random.uniform(1, 5)
+		if relevantSimilarities == 0: return 0
+
 		return neighborVotes / relevantSimilarities
 
 
