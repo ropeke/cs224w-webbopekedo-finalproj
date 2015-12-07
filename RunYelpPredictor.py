@@ -14,6 +14,8 @@ from FriendshipOverlapSimilarity import FriendshipOverlapSimilarity
 from CommunitySimilarity import CommunitySimilarity
 from CommuteTimeSimilarity import CommuteTimeSimilarity
 from PageRankSimilarity import PageRankSimilarity
+from FeatureDistanceSimilarity import FeatureDistanceSimilarity
+from FeatureFactory import FeatureFactory
 
 # Valid values for arguments
 similarityMeasureStrings = ['foverlap','community','commute','pagerank','featureDist']
@@ -121,7 +123,9 @@ def main(argv):
 	elif argv[1] == 'pagerank':
 		similarityMeasure = PageRankSimilarity(friendshipMap)
 	elif argv[1] == 'featureDist':
-		similarityMeasure = 
+		factory = FeatureFactory((degreeCentrality, closenessCentrality, betweennessCentrality))
+		vectors = FeatureFactory.getFeatureMatrix()
+		similarityMeasure = FeatureDistanceSimilarity(vectors)
 
 	
 	if buildClean:
