@@ -96,6 +96,11 @@ def main(argv):
 
 	friendshipMap = yelpData[0]
 	businessReviews = yelpData[1]
+	degreeCentrality = yelpData[2]
+	closenessCentrality = yelpData[3]
+	betweennessCentrality = yelpData[4]
+
+	print len(betweennessCentrality)
 
 	# Create appropriate similarity measure (with necessary yelp data) and
 	# either calculate similarities from scratch (buildClean == True) or

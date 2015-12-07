@@ -23,6 +23,10 @@ business_map = {}
 pair_map = {}
 business_reviews = {}
 
+degree_centrality_map = {}
+betweenness_centrality_map = {}
+closeness_centrality_map = {}
+
 #The graph
 YGraph = nx.Graph()
 
@@ -60,18 +64,13 @@ def initializeGraph():
                 YGraph.add_edge(user, friend)
                 friendship_map[user].append(friend)
 
+    degree_centrality_map = nx.degree_centrality(YGraph)
+    closeness_centrality_map = nx.closeness_centrality(YGraph)
+    betweenness_centrality_map = nx.betweenness_centrality(YGraph)
+
     print "The number of nodes in the graph is: %d" % YGraph.number_of_nodes()
     print "The number of edges in the graph is: %d" % YGraph.number_of_edges()
     print "Density: %f" % (YGraph.number_of_edges() * 1.0 / YGraph.number_of_nodes())
-
-    print "Finding Communities"
-    communities = list(nx.k_clique_communities(YGraph, 7))
-    print "Number of communities: %d" % len(communities)
-    total_size = 0
-    for c in communities:
-        print len(c)
-        total_size += len(c)
-    print "Total size: %d" % total_size
 
 
 # """
@@ -134,6 +133,15 @@ def loadFromFile():
         f2 = open( "businessReviews.p", "rb" )
         business_reviews = pickle.load(f2)
         f2.close()
+        f3 = open( "degreeCentrality.p", "rb" )
+        friendship_map = pickle.load(f3)
+        f3.close()
+        f4 = open( "closenessCentrality.p", "rb" )
+        business_reviews = pickle.load(f4)
+        f4.close()
+        f5 = open( "betweennessCentrality.p", "rb" )
+        friendship_map = pickle.load(f5)
+        f5.close()
     except IOError as e:
         sys.stderr.write("I/O error({0}): {1}".format(e.errno, e.strerror)+'\n')
         sys.stderr.write('Try running with -buildClean = clean!\n')
@@ -174,8 +182,11 @@ def parseJsons(businessJson='pa_business.json', reviewJson='pa_review.json', use
 
     pickle.dump(friendship_map, open( "friendshipMap.p", "wb" ) )
     pickle.dump(business_reviews, open( "businessReviews.p", "wb" ) )
+    pickle.dump(degree_centrality_map, open( "degreeCentrality.p", "wb" ) )
+    pickle.dump(closeness_centrality_map, open( "closenessCentrality.p", "wb" ) )
+    pickle.dump(betweenness_centrality_map, open( "betweennessCentrality.p", "wb" ) )
 
-    return (friendship_map, business_reviews)
+    return (friendship_map, business_reviews, degree_centrality_map, closeness_centrality_map, betweenness_centrality_map)
 
 
 
