@@ -16,7 +16,7 @@ import cPickle as pickle
 
 columnSeparator = "|"
 raw_friendship_map = {} # unsanitized friendship map including dead nodes
-friendship_map = {} # sanitized friendship map 
+friendship_map = {} # sanitized friendship map
 user_map = {}
 review_map = {}
 business_map = {}
@@ -54,7 +54,7 @@ def initializeGraph():
         YGraph.add_node(user, type="user")
         if user not in friendship_map:
             friendship_map[user] = []
-        friends = raw_friendship_map[user] 
+        friends = raw_friendship_map[user]
         for friend in friends:
             if friend in raw_friendship_map:
                 YGraph.add_edge(user, friend)
@@ -72,6 +72,16 @@ def initializeGraph():
     print "The number of edges in the graph is: %d" % YGraph.number_of_edges()
     print "Density: %f" % (YGraph.number_of_edges() * 1.0 / YGraph.number_of_nodes())
 
+    # used for testing purposes to figure out range of community minimum sizes that I should have!
+    # print "Finding Communities"
+    # for test_variable in range(2,11):
+    #     communities = list(nx.k_clique_communities(YGraph, test_variable))
+    #     print "Number of communities: %d" % len(communities)
+    #     #total_size = 0
+        #for c in communities:
+        #    print len(c)
+        #    total_size += len(c)
+        #print "Total size: %d" % total_size
     return (degree_centrality_map, closeness_centrality_map, betweenness_centrality_map)
 
 
@@ -96,7 +106,7 @@ def initializeGraph():
 
 
 # """
-# similarityFriendshipOverlap - Finds the similaritiy of two nodes by comparing the 
+# similarityFriendshipOverlap - Finds the similaritiy of two nodes by comparing the
 # fraction of their friends that overlap
 # """
 # def similarityFriendshipOverlap(node1, node2):
@@ -117,7 +127,7 @@ def processReviews():
     for (user_id, business_id), review in review_map.iteritems():
         if business_id not in business_reviews:
             business_reviews[business_id] = []
-        
+
         user_rating = review['stars']
         review_entry = (user_id, user_rating)
         business_reviews[business_id].append(review_entry)
@@ -188,5 +198,5 @@ def parseJsons(businessJson='pa_business.json', reviewJson='pa_review.json', use
     pickle.dump(closeness_centrality_map, open( "closenessCentrality.p", "wb" ) )
     pickle.dump(betweenness_centrality_map, open( "betweennessCentrality.p", "wb" ) )
 
-    return (friendship_map, business_reviews, degree_centrality_map, closeness_centrality_map, betweenness_centrality_map)
+    return (friendship_map, business_reviews, degree_centrality_map, closeness_centrality_map, YGraph)
 

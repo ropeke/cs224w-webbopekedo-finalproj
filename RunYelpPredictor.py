@@ -43,7 +43,7 @@ Run with parameters in this order:
 -predictionModel: 		[baseline, knn]					--	model for predicting ratings
 -trials: 				[0 to totalTrials]				--	integer number of trial results to print
 -(optional) buildClean:	[clean]							--	repopulates globals from json files
-															otherwise loads from .bin	
+															otherwise loads from .bin
 """
 def main(argv):
 	# Set default values
@@ -96,6 +96,8 @@ def main(argv):
 
 	friendshipMap = yelpData[0]
 	businessReviews = yelpData[1]
+	if buildClean:
+			yelpGraph = yelpData[5]
 	degreeCentrality = yelpData[2]
 	closenessCentrality = yelpData[3]
 	betweennessCentrality = yelpData[4]
@@ -111,7 +113,9 @@ def main(argv):
 	if argv[1] == 'foverlap':
 		similarityMeasure = FriendshipOverlapSimilarity(friendshipMap)
 	elif argv[1] == 'community':
-		similarityMeasure = CommunitySimilarity()
+		print "this is not breaking as of yet - testing the ability to pass the networkX graph through"
+		print type(yelpGraph)
+		similarityMeasure = CommunitySimilarity(yelpGraph)
 	elif argv[1] == 'commute':
 		similarityMeasure = CommuteTimeSimilarity()
 	elif argv[1] == 'pagerank':
@@ -146,4 +150,3 @@ def main(argv):
 
 if __name__ == "__main__":
 	main(sys.argv)
-
