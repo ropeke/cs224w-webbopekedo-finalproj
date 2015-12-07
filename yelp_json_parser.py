@@ -72,7 +72,7 @@ def initializeGraph():
     print "The number of edges in the graph is: %d" % YGraph.number_of_edges()
     print "Density: %f" % (YGraph.number_of_edges() * 1.0 / YGraph.number_of_nodes())
 
-    return (degree_centrality_map, closeness_centrality_map)
+    return (degree_centrality_map, closeness_centrality_map, betweenness_centrality_map)
 
 
 # """
