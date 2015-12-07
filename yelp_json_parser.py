@@ -82,7 +82,7 @@ def initializeGraph():
         #    print len(c)
         #    total_size += len(c)
         #print "Total size: %d" % total_size
-    return (degree_centrality_map, closeness_centrality_map)
+    return (degree_centrality_map, closeness_centrality_map, betweenness_centrality_map)
 
 
 # """
