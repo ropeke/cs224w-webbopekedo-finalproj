@@ -188,5 +188,5 @@ def parseJsons(businessJson='pa_business.json', reviewJson='pa_review.json', use
     pickle.dump(closeness_centrality_map, open( "closenessCentrality.p", "wb" ) )
     pickle.dump(betweenness_centrality_map, open( "betweennessCentrality.p", "wb" ) )
 
-    return (friendship_map, business_reviews, degree_centrality_map, closeness_centrality_map)
+    return (friendship_map, business_reviews, degree_centrality_map, closeness_centrality_map, betweenness_centrality_map)
 
