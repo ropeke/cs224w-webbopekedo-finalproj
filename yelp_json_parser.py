@@ -23,10 +23,6 @@ business_map = {}
 pair_map = {}
 business_reviews = {}
 
-degree_centrality_map = {}
-betweenness_centrality_map = {}
-closeness_centrality_map = {}
-
 #The graph
 YGraph = nx.Graph()
 
@@ -64,13 +60,19 @@ def initializeGraph():
                 YGraph.add_edge(user, friend)
                 friendship_map[user].append(friend)
 
+    print "Calculating Centarlities"
     degree_centrality_map = nx.degree_centrality(YGraph)
+    print len(degree_centrality_map)
     closeness_centrality_map = nx.closeness_centrality(YGraph)
+    print len(closeness_centrality_map)
     betweenness_centrality_map = nx.betweenness_centrality(YGraph)
+    print len(betweenness_centrality_map)
 
     print "The number of nodes in the graph is: %d" % YGraph.number_of_nodes()
     print "The number of edges in the graph is: %d" % YGraph.number_of_edges()
     print "Density: %f" % (YGraph.number_of_edges() * 1.0 / YGraph.number_of_nodes())
+
+    return (degree_centrality_map, closeness_centrality_map)
 
 
 # """
@@ -134,13 +136,13 @@ def loadFromFile():
         business_reviews = pickle.load(f2)
         f2.close()
         f3 = open( "degreeCentrality.p", "rb" )
-        friendship_map = pickle.load(f3)
+        degree_centrality_map = pickle.load(f3)
         f3.close()
         f4 = open( "closenessCentrality.p", "rb" )
-        business_reviews = pickle.load(f4)
+        closeness_centrality_map = pickle.load(f4)
         f4.close()
         f5 = open( "betweennessCentrality.p", "rb" )
-        friendship_map = pickle.load(f5)
+        betweenness_centrality_map = pickle.load(f5)
         f5.close()
     except IOError as e:
         sys.stderr.write("I/O error({0}): {1}".format(e.errno, e.strerror)+'\n')
@@ -175,7 +177,7 @@ def parseJsons(businessJson='pa_business.json', reviewJson='pa_review.json', use
 
     # we won't need the graph for the first part
     # UPDATE by James: initialized because needed to populate friendship_map
-    initializeGraph()
+    (degree_centrality_map, closeness_centrality_map, betweenness_centrality_map) = initializeGraph()
 
     # business reviews are in the global business_reviews
     processReviews()
@@ -186,14 +188,5 @@ def parseJsons(businessJson='pa_business.json', reviewJson='pa_review.json', use
     pickle.dump(closeness_centrality_map, open( "closenessCentrality.p", "wb" ) )
     pickle.dump(betweenness_centrality_map, open( "betweennessCentrality.p", "wb" ) )
 
-    return (friendship_map, business_reviews, degree_centrality_map, closeness_centrality_map, betweenness_centrality_map)
+    return (friendship_map, business_reviews, degree_centrality_map, closeness_centrality_map)
 
-
-
-
-    # similarities are in the global pair_map
-    # calculateSimilarities() 
-
-    
-
-    # Continue Coding Here

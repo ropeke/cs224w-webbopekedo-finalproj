@@ -100,7 +100,8 @@ def main(argv):
 	closenessCentrality = yelpData[3]
 	betweennessCentrality = yelpData[4]
 
-	print len(betweennessCentrality)
+	print "Betweenness Centralities"
+	print len(degreeCentrality)
 
 	# Create appropriate similarity measure (with necessary yelp data) and
 	# either calculate similarities from scratch (buildClean == True) or
