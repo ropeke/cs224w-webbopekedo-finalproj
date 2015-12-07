@@ -37,6 +37,7 @@ def runRegressor(similarityScores, businessToRaters, predictor):
 		for i in range(len(ratings)):
 			userId = ratings[i][0]
 			predictedValue = predictor.predict(userId, businessId, similarityScores, ratings)
+			if predictedValue == 0: continue
 			observedValue = ratings[i][1]
 			prediction = Prediction(userId, businessId, predictedValue, observedValue)
 			predictions.append(prediction)
