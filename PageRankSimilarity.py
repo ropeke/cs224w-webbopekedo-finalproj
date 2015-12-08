@@ -45,7 +45,11 @@ class PageRankSimilarity:
 		TODO: Calculate PageRank between each pair of nodes (prune if too costly).
 		"""
 		# Calculate similarities and populate similarities dict here
+		user_number = 0
 		for user, friends in self.friendshipMap.iteritems():
+			print user_number
+			user_number += 1
+
 			# Keep track of number of times a node is randomly visited
 			pageRankScores = {}
 
@@ -74,4 +78,4 @@ class PageRankSimilarity:
 
 		print "Number of pairs: %d" % len(self.similarities)
 		# Write similarity map to file
-		pickle.dump(self.similarities, open( "pageRankSim.p", "wb" ) )
+		# pickle.dump(self.similarities, open( "pageRankSim.p", "wb" ) )

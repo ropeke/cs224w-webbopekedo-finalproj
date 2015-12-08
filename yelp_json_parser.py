@@ -61,11 +61,11 @@ def initializeGraph():
                 friendship_map[user].append(friend)
 
     print "Calculating Centarlities"
-    degree_centrality_map = nx.degree_centrality(YGraph)
+    degree_centrality_map = {} #nx.degree_centrality(YGraph)
     print len(degree_centrality_map)
-    closeness_centrality_map = nx.closeness_centrality(YGraph)
+    closeness_centrality_map = {} #nx.closeness_centrality(YGraph)
     print len(closeness_centrality_map)
-    betweenness_centrality_map = nx.betweenness_centrality(YGraph)
+    betweenness_centrality_map = {} #nx.betweenness_centrality(YGraph)
     print len(betweenness_centrality_map)
 
     print "The number of nodes in the graph is: %d" % YGraph.number_of_nodes()

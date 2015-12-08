@@ -92,7 +92,7 @@ def main(argv):
 	# a map from business -> users who rated that business
 	# TODO: expand what yelp data contains as necessary for other sim measures
 	if buildClean:
-		yelpData = yelp_json_parser.parseJsons()
+		yelpData = yelp_json_parser.parseJsons(businessJson='AZ_business.json', reviewJson='AZ_review.json', userJson='AZ_user.json')
 	else:
 		yelpData = yelp_json_parser.loadFromFile()
 
@@ -136,6 +136,7 @@ def main(argv):
 	similarityScores = similarityMeasure.similarities
 
 	print len(similarityScores)
+	print "Starting Regressor"
 
 	# Create appropriate prediction model and
 	# generate list of predictions

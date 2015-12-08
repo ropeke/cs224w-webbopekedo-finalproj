@@ -24,7 +24,7 @@ state_user_map = {}
 state_business_map = {}
 
 PRUNE_STATE = 'AZ'
-BUSNIESS_LIMIT = 3000
+BUSNIESS_LIMIT = 6000
 
 # Number k of most similar nodes ot consider
 k = 5
@@ -53,10 +53,15 @@ def parseJson(json_file):
 
 
 def pruneData():
+    counter = 0
     for (business_id, business) in business_map.iteritems():
         state = business['state']
         if state == PRUNE_STATE:
             state_business_map[business_id] = business
+
+        counter += 1
+        if counter >= BUSNIESS_LIMIT:
+            break
 
     for (user_id, business_id), review in review_map.iteritems():
         if business_id in state_business_map:

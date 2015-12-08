@@ -49,8 +49,11 @@ class FriendshipOverlapSimilarity:
 		We take all pairs of friends of friends and calculate
 		the Jaccard index of their friend sets.
 		"""
+		counter = 0
 		# loop through friends
 		for user in self.friendship_map:
+			print counter
+			counter += 1
 			if user not in self.similarities:
 				self.similarities[user] = list()
 			friends = self.friendship_map[user]
@@ -66,7 +69,7 @@ class FriendshipOverlapSimilarity:
 
 		print "Number of pairs: %d" % len(self.similarities)
 		# Write similarity map to file
-		pickle.dump(self.similarities, open( "foverlapSim.p", "wb" ) )
+		# pickle.dump(self.similarities, open( "foverlapSim.p", "wb" ) )
 
 	def similarityFriendshipOverlap(self, userIdA, userIdB):
 		"""
