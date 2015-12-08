@@ -5,20 +5,33 @@ Author: James Webb (jmwebb@stanford.edu)
 Created: 12/5/2015
 """
 
-featureList = list()
-userFeatures = dict()
+class FeatureFactory:
+	featureList = list()
+	userFeatures = dict()
 
-def __init__(self):
-	featureList.append('BetweenessCentrality');
-	featureList.append('DegreeCentrality');
-	featureList.append('ClosenessCentrality');
+	def __init__(self, dataset):
+		self.featureList = list()
+		self.userFeatures = dict()
+		self.featureList.append('BetweenessCentrality');
+		self.featureList.append('DegreeCentrality');
+		self.featureList.append('ClosenessCentrality');
 
-def addUser(self, userId):
-	userFeatures[userId] = [0]*len(featureList)
+		for userId in dataset[0].keys():
+			self.addUser(userId)
 
-def addFeature(self, userId, featureName, value):
-	if featureName in featureList:
-		userFeatures[userId][featureIndexfeatureList().index(featureName)] = value
+		for featureIdx in xrange(len(dataset)):
+			featureLabel = self.featureList[featureIdx]
+			featureData = dataset[featureIdx]
+			for userId in featureData.keys():
+				self.addFeature(userId, featureLabel, featureData[userId])
 
-def getFeatureMatrix(self):
-	return userFeatures
+
+	def addUser(self, userId):
+		self.userFeatures[userId] = [0]*len(self.featureList)
+
+	def addFeature(self,userId, featureName, value):
+		if featureName in self.featureList:
+			self.userFeatures[userId][self.featureList.index(featureName)] = value
+
+	def getFeatureMatrix(self):
+		return self.userFeatures
