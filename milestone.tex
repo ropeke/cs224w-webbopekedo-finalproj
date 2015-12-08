@@ -1,0 +1,330 @@
+\documentclass[10pt]{article}
+\usepackage{amsmath}
+\usepackage{graphicx,psfrag,epsf}
+\usepackage{enumerate}
+\usepackage{natbib}
+
+\newcommand{\blind}{0}
+
+\addtolength{\oddsidemargin}{-.75 in}%
+\addtolength{\evensidemargin}{-.75in}%
+\addtolength{\textwidth}{1.5in}%
+\addtolength{\textheight}{1.3in}%
+\addtolength{\topmargin}{-.8in}%
+
+
+\begin{document}
+
+
+%\bibliographystyle{natbib}
+
+\def\spacingset#1{\renewcommand{\baselinestretch}%
+{#1}\small\normalsize} \spacingset{1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\if0\blind
+{
+  \title{\bf CS224W Project Milestone: Predicting Yelp Ratings From Social Network Data}
+  \author{\textbf{Kelvin Do (kelvindo@), Rotimi Opeke (ropeke@), James Webb (jmwebb@)} \hspace{.2cm}\\
+    Department of Computer Science, Stanford University}
+  \maketitle
+} \fi
+
+\if1\blind
+{
+  \bigskip
+  \bigskip
+  \bigskip
+  \begin{center}
+    {\LARGE\bf Title}
+\end{center}
+  \medskip
+} \fi
+
+\bigskip
+
+\begin{abstract}
+Yelp is a popular consumer application that has consistently kept itself relevant by integrating business reviews within an extensive social network. While the ability to add friends and internally message other users isn't as strongly emphasized across the product, the social component of the application helps provide incentive for users contribute to the greater Yelp community. This graph-like community, of both users and businesses creates an invaluable network of information from which future user usage can be modeled. This paper examines the relational Yelp data to make predictions about the actions that users would take on the network - specifically to make predictions on their future review scores. Through a study of the communities that exist within the graph and through several different similarity metrics we hope to serve unique predictions about a user's future review scores based on information made available through graphical analysis.
+\end{abstract}
+
+\spacingset{1}
+\section{Introduction}
+\label{sec:intro}
+Yelp is one of the more unique social networks in the sense that it thrives off of highly qualitative user-inputted reviews. Each one of these reviews, tailored to a multitude of businesses serve as an unbiased platform in which the demographic has an equal voice in ranking and comparing local businesses.  With information about how certain users chose to review businesses and with information about what users are "friends" with others, the ability to make predictions about future reviews greatly increases.\\
+
+Our first step in this process would be to use several similarity classifiers to determine how related users are in our social graph. Further down below, we will show how we leverage "friend-overlap", community clustering and random-walk formulas to calculate similarity between users.
+
+In order to fully take advantage of these similarity measures to make future predictions about user reviews for businesses, we have to feed graph data into recommender systems to provide a good gauge of future outcomes. One of the major decisions we had to make in this project was figuring out how to devise these recommender systems, but leveraging techniques in Collaborative Filtering (CF), Markov Chains and some heuristics of our own, we hope to better take advantage of the graph data to make review predictions.\\
+
+In the end, we expect that using these implicit measures of similarity in conjunction with explicit social connections would ultimately increase recommendation/ranking prediction accuracy.
+
+\section{Prior Work}
+\label{sec:meth}
+
+\subsection{Effects of User Similarity in Social Media (Anderson, Huttenlocher, Kleinberg, Leskovec, 2012)}
+
+This paper explored the possibilities of predicting evaluations between users based on information about the users themselves, not their previous evaluation history. Specifically, for sites that allow user contribution to be rated, such as Wikipedia and StackOverflow, the research examined how a contribution would be received by a given audience. The researchers used a similarity score, based on overlapping interests between users, and studied how this corresponded with positive evaluation of user contributions. \\
+
+%This research was strong in that it very succinctly demonstrated the efficacy of using similarity scores. Each result showed much promise for the relationship between users’ interests and their evaluation of each other’s input. What the paper lacked was any extension into addressing the content of user contributions. Although it established similar users tend to approve of each other’s opinions, it did not attempt to predict if similar users have similar opinions.\\
+
+\subsection{Evaluating Collaborative Filtering Recommender Systems (Herlocker, Konstan, Terveen \& Riedl, 2004)}
+
+%Recommender systems with collaborative filtering have risen to become the source of most ‘suggested items’ on sites where users have many options to choose from like e-commerce and movie streaming. 
+In, Herlocker et. al. discuss the main considerations when evaluating recommender systems since many implementations consider a wide range of metrics and data sets. Recommendation goals can vary widely based on its service to its users. This paper highlights how it’s important to consider that some recommender system success can vary widely if you consider what the goal of the recommendation is (ex. looking for a movie to watch versus looking to browse through a news feed). Additionally there should be consideration that a data set is not too sparse and is appropriate to fit the goals of the recommendation. \\
+
+One of the most insightful parts was the discussion of accuracy metrics. Regardless of how accurate a recommender system claims to be, it may be useless if the accuracy metric incorrectly captures the goal of the recommendation. 
+%Some accuracy metrics to consider are \textbf{Mean Absolute Error (and related), Classification Accuracy Metrics}, and \textbf{Prediction-Rating Correlation}. While all metrics measure some form of accuracy, not all metrics consider the same recommendation goals. For example, if strongly penalizing bad recommendations is a goal, then a mean squared error can be a much stronger predictor of accuracy than mean absolute error. Accuracy metrics should be carefully considered. \\
+
+\subsection{Random-Walk Computation of Similarities between Nodes of a Graph (Fouss, Pirotte, Renders, Saerens, 2007)}
+
+This paper explores the possibility of relating nodes in a movie/viewer database through similarity measures. With this calculated similarity between viewers, between movies, and between viewers and movies as the engine behind a collaborator recommendation system. In particular, the research explored the use of random walks and Markov chains as a measure of similarity between two given nodes. This problem space relates to the topics of random walks algorithms such as PageRank that have been discussed in class. \\
+
+The greatest strength of this research was the thoroughness with which it explored many different scoring algorithms for its recommendation system. The novel Euclidean Commute Time Distance method was compared against 11 other algorithms such as average commute time, k nearest neighbors, maximum-frequency, cosine coefficient, etc. In doing so it introduces many useful methods for gauging the similarity between two nodes. One area the paper admittedly did not tread was the use of weighted edges (i.e. the review rating of movie watchers) and instead opted for use of watched versus not watched edges. Including these weights could have been useful in generating a better approximation of how much a viewer will like a given movie. \\
+
+
+\subsection{Further Discussion}
+Our review of the current research in this problem space has left us with several important notions. In the tasks of rating prediction and recommendation systems, calculating similarity scores between customers (movie-watchers, restaurant-goers, etc.) and between products (movies, online purchases, restaurants, etc.) can greatly improve accuracy. We also learned that there are many nuanced ways of obtaining similarity measures. Fouss et al explored network-based similarity scores such as random walk-based ECTD and k nearest neighbors, whereas Andersen et al focused on qualities of the nodes themselves (overlap in expressed interests). \\
+
+While [1] explores social graph data to make predictions about ratings, it doesn't use a recommender system to make their predictions. [2] dives into the literature of recommender systems, but doesn't put forth any new applications of recommender systems. [3] begins the discussion of node similarity, but only explores one method of random walk applications. Notably absent from these studies was the use of social, friendship-based network information between nodes to find similarity to make recommender system based recommendations. We hypothesize that using these implicit measures of similarity in conjunction with explicit social connections would ultimately increase recommendation/ranking prediction accuracy.
+
+\label{sec:verify}
+
+\section{Data Set}
+
+\subsection{Yelp Dataset Challenge}
+The original motivation was to use data from the Yelp Dataset Challenge to predict the reviews of the many users included in this dataset. The Yelp Dataset advertises 1.6M reviews by 366K users for 61K businesses worldwide. In the user friendship graph, there are over 2.9M social edges between the 366K users making for an average of 7.9 edges per user. \\
+
+The following is the degree distribution graph for the entire Yelp Dataset Challenge dataset:
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.4\textwidth]{full_degree_distribution.png}
+\caption{Degree Distribution of the Full Yelp Dataset}
+\end{figure}
+
+From this, we can see that the Yelp Dataset follows a Power Law degree distribution fairly well starting at around nodes with degree 6. This makes sense since with most social networks, there exhibits preferential attachment behavior. In the case of the Yelp Social network, this could be explained by the fact that the most active Yelp users likely post the most reviews on Yelp and as a result, their reviews are seen by more users. Additionally, the earliest Yelp users have also had more time to visit more restaurants and rate them. As a result, the users with the most ratings have the greatest opportunity to make friends with other users. \\
+
+Though it would be great to work with such a large and dense dataset, it produces multiple challenges. The first, is that the dataset features businesses from specific cities in the world. As a result, the user friendship graph will likely exhibit strong clustering for those people who are from those cities. Trying to measure similarity between two nodes located in different continents doesn't make as much sense. \\
+
+The second issue is that the dataset is too large to compute in a realistic amount of time given the tools and resources at our disposal. At 366K nodes and $ N^2 $ possible pairs of nodes, this problem isn't feasible with the given dataset.
+
+\subsection{Pruned Dataset: Pennsylvania Yelp Data}
+
+To address the problems with the entire Yelp Dataset, we decided to choose a specific state with a medium sized number of users to run our prediction algorithm on. This directly addresses the first issue of clustering since we simply users in the same state are more likely to be in the same friendship network. Additionally, the smaller size makes the problem of calculating similarities between pairs of nodes more feasible. We did this by taking only businesses located in Pennsylvania. We only took reviews on businesses from the subset of businesses and users who wrote those reviews.\\
+
+After this process of pruning the dataset, we now have 2.9K users, 3.0K businesses, and 64.2K reviews. From the user friendship graph, we have 13.6K edges making for an average degree density of 4.5 edges per user. \\
+
+The following is the degree distribution graph for the Pruned Yelp Dataset focusing on Pennsylvania:
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.4\textwidth]{degree_distribution.png}
+\caption{Degree Distribution of the Pruned Yelp Dataset for Pennsylvania}
+\end{figure}
+
+From the graph, the distribution doesn't follow a power law as the full dataset does since there isn't as much data anymore. The goal for choosing this initial dataset was to give us a reasonable dataset to work with that allows us to develop quickly and come up with initial predictions. As we finalize the design of the similarity measures and regressors, we can easily tweak the pruning code to select a different state that represents a larger subset of the original Yelp dataset.
+
+\section{Methodology}
+\label{sec:conc}
+
+%\subsection{Data and the Problem}
+%
+%
+%Yelp's Public Academic Data provides us with the reviews of the 250 closest businesses to 30 universities around the United States. In whole, the data set provides us with json-objects for the relevant users (and their reviews) for these 250 businesses. While this large and interwoven data set provides us with a massive repository of reviews to make inferences about the quality of businesses, the current organization of information does necessarily suit our future goals to make predictions about user's future business reviews. \\
+%
+%In the end, we decided to "prune" our graph down by only including users that had submitted reviews for businesses that were located in Pennsylvania (specifically in Pittsburgh). On the other hand, by removing users that had no "friends" in the networks (rendering our similarity measures useless), we removed excessive data that had no real effect on other represented nodes in our graph.
+%
+%\subsection{Representing Our Graph}
+%
+%We decided to represent both of our users and businesses as nodes, and using the reviews that went from users to the specific businesses as the premise for our edges (carrying the weight of the review's star rating). Because of the limited scope of our data (we limited the graph down to users that had made reviews for Pittsburgh businesses with at least one Yelp friend), we knew that there was generally going to be a high-level of connectedness in the graph.\\
+
+\subsection{Predicting User Ratings with Recommender Systems}
+
+All user review predictions will be based on recommender systems. Traditional recommender system approaches such as movie recommendations or similar product suggestions, use the method of Collaborative Filtering. In this approach, users would be measured for how ‘similar’ they are to other users based off of their actions these users can take, such as rate movies or products. Examples of metrics that have traditionally been used to measure the similarity between two users are the \textbf{Cosine Similarity Measure} [6]:  
+
+$$ sim(x, y) = arccos(r_{x}, r_{y}) = \frac{r_{x} \cdot r_{y}}{||r_{x}|| \cdot ||r_{y}||} $$
+
+and the \textbf{Pearson Correlation Coefficient} [6]:
+
+$$ sim(x, y) = \frac{\sum_{s \in S_{xy}}(r_{sx} - \bar r_{x})(r_{sy} - \bar r_{y})}{\sqrt{\sum_{s \in S_{xy}}(r_{sx} - \bar r_{x})^{2}} \sqrt{\sum_{s \in S_{xy}}(r_{sy} - \bar r_{y})^{2}}} $$
+
+To go from a similarity metric to a prediction, the following method and equation can then be applied:
+
+Let $r_{x}$ be the vector of user $x$ ratings
+Let $N$ be the $k$ most similar users to $x$ who have rated item $i$
+
+Prediction of item $s$ for user $x$ [6]:
+
+$$ r_{xi} = \frac{\sum_{y \in N} sim(x, y) \cdot r_{yi}}{\sum_{y \in N} sim(x, y)} $$
+
+The way we will extend this research is by calculating user similarity based on properties of the user social graph instead of the above similarity measures.
+
+\subsection{Random Walk Computation of Similarity}
+
+One possible measure of similarity based on the user social graph is a random walk computation of similarity. The assumption of using this metric is that nodes that can be randomly walked between with higher probability are likely to be more similar. This can be conceptually explained by the reasoning that people who are direct friends or have many friends of friends likely have more similarity that those who are only related by a friend of a friend. Similarly, random walk algorithms with take less time on average to traverse between two nodes. \\
+
+One such random walk measure of similarity is \textbf{Euclidean Commute Time Distance}. $[n(k|i)]^{1/2}$ is defined as the square root of the average number of steps that a random walker, starting in state $i \neq k$, will take to enter state $k$ and then return to state $i$. Thus, the Euclidean Commute Time Distance is the expectation of this quantity:
+
+\begin{equation}
+\begin{aligned}
+ECTD &= [n(k|i)]^{1/2} \\
+&= [m(k|i) + m(i|k)]^{1/2} \\
+&= [E[T_{ik} | s(0) = i] + E[T_{ki} | s(0) = k]]^{1/2}.
+\end{aligned}
+\end{equation}
+
+\subsection{Community Similarity}
+
+Another measure of similarity is whether or not two nodes are in the same community. Using community detection as well as other data that we have about users in the Yelp data set, we can make recommendations considering nodes in the same cluster as the most similar. \\
+
+We know that business ratings don't occur in a vacuum. Users in the same community of a user could lead to influencing a user's rating accordingly. For example, members of a community may have visited a restaurant together and during the meal, complained terribly about the experience. As a result, if one member gives the restaurant a low rating, it's likely other users will give the restaurant a low rating as well. \\
+
+%We hope to run the same recommender system with collaborative filtering, but strictly considering nodes in the same cluster as most similar and as a result are the main predictors of a users rating for a business. To separate users into respective communities, we plan to run community detection algorithms such as the \textbf{Minimum Cut Method} on the social graph of friends on Yelp.
+
+
+\subsection{Jaccard Similarity}
+
+Our final measure of similarity is based on the proportion overlap of friends for two given users, known as the Jaccard Index or Jaccard Coefficient [7]. The basis for this is that users with the most similar friend sets may also have a similar set of business reviews on Yelp. This is just another way to use the social network data to derive information about similarities between two users that aren't possible with the user-review information alone. \\
+
+Given two users $x$ and $y$, let $F_{x}$ be the set of all nodes that have an edge to $x$ and $F(y)$ be the set of all nodes that have an edge to $y$. The Jaccard similarity is given given by:
+
+$$ sim(x, y) = \frac{|F_{x} \cap F_{y}|} {|F_{x} \cup F_{y}|} $$
+
+\subsection{Evaluation}
+From the recommender system, we will be able to predict ratings that users give to businesses on Yelp. We also have the ground truth data from the Yelp data set of what ratings users actually gave to businesses. From these two set of numbers, we can then evaluate our prediction using known accuracy metrics. 
+
+As discussed in [2], Herlocker et. al. point out that an appropriate accuracy metric that aligns with the goal of the recommendation is crucial to the success of the recommender system. One such accuracy metric that makes sense for the goals of our recommender system is the \textbf{Root Mean Squared Error (RMSE)} since we don't care as much about small differences in predictions, but we care much more about large differences between predicted and actual ratings. The advantage of using RMSE is that it's a relatively understandable metric since it is clear how error is being measured. Additionally, RMSE has well studied statistical properties that provide for testing the significance of a difference between mean errors of two systems. Let $R_{p}$ be the prediction rating and $R_{a}$ be the actual rating. RMSE is given by: 
+
+$$ RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n}(R_{p} - R_{a})^{2}} $$
+
+%Another possible adaptation of using RMSE is to only calculate the RMSE on the top $k$ reviews that the user has given. The reason for is that as a service that gives recommendations for Yelp businesses, we care most about recommending what we would consider the best recommendations. It's less important what the middle and bottom recommendations are, as long as our best recommendations are accurate. 
+
+%%% SECTION FOR DATA INPUT %%%
+
+\section{Results}
+
+For the comparison of our different models and similarity measures, we use the mean squared error which is defined as follows:
+
+$$ \mbox{MSE} = \frac{1}{n}\sum_{i=1}^n(\hat{Y_i} - Y_i)^2
+$$
+
+where $\hat{Y_i}$ is the predicted value of an unknown rating and $Y_i$ is the actual or observed value of that rating. A perfect system would have an MSE of 0. Table~\ref{table: results} displays the MSE for our different models.
+
+\begin{table}[ht]
+\centering 
+\begin{tabular}{c c c}
+\hline\hline
+Regressor & Similarity Measure & MSE \\ [0.5ex]
+\hline
+Random & N/A & 3.429 \\
+kNN & Jaccard & 2.573 \\ [1ex]
+\hline 
+\end{tabular}
+\caption{Mean squared error results from various regressors and similarity measures.}
+\label{table: results}
+\end{table}
+
+\subsection{Baseline (Random Regression)}
+As a baseline, we use a random regressor to predict the ratings of businesses by users. For any given user $u$ and business $b$, the rating that $u$ gives to $b$ will be a random variable uniformly distributed from 1 to 5 (the possible range for a Yelp rating). Note that the results in Figures~\ref{fig: baselinehisto} and~\ref{fig: baselineconfusion} and Table~\ref{table: results} represent a single run of the baseline model. The MSE with the baseline model was 3.429. Looking at Figure~\ref{fig: baselinehisto}, the error histogram appears to have a uniform distribution with a slight positive skew. This leads us to believe that there is a positive bias in the ratings on the Yelp Data.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.4\textwidth]{PEH-FO-RO.png}
+\caption{Histogram of errors (predicted - observed) for our baseline model.}
+\label{fig: baselinehisto}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.95\textwidth]{CM-FO-RO-1.png}
+\caption{Confusion matrix of predicted ratings and observed ratings for baseline model.}
+\label{fig: baselineconfusion}
+\end{figure}
+
+\subsection{Jaccard Similarity}
+
+Our k-nearest-neighbors regressor with Jaccard similarity significantly improved upon our baseline model (MSE reduced by 25\%). As can be seen in Figure~\ref{fig: friendshiphisto}, more of the probability mass is concentrated in and around the 0 bin. However, looking at Figure~\ref{fig: friendshipconfusion}, we see that our more common errors involve predicting a low rating when the observed rating is high. This is most likely the result of data sparseness. It may often be the case that user $u$'s k-nearest-neighbors have not rated the business in question, thus there are very few ratings to average. Moving forward, we should develop an interpolation scheme as a backup for when there is not enough information available from a user's k-nearest-neighbors. These neighbors are currently determined via a similarity minimum threshold, which was set to 0 for this trial. Perhaps increasing this threshold could produce more relevant neighbors, but at the expense of making our neighbors even more sparse.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.4\textwidth]{PEH-FO-KNN.png}
+\caption{Histogram of errors (predicted - observed) for our kNN model with Jaccard similarity.}
+\label{fig: friendshiphisto}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.95\textwidth]{CM-FO-KNN-1.png}
+\caption{Confusion matrix of predicted ratings and observed ratings for kNN regressor with Jaccard similarity measure.}
+\label{fig: friendshipconfusion}
+\end{figure}
+
+\pagebreak
+
+\section{Further Work}
+
+Through this project milestone, the majority of the groundwork to perform future analysis has been set. By spending time to prune the data and to finish the evaluation of the Jaccard Similarity measurement, we will just have to implement other similarity measurements. We plan to investigate the \textbf{ECTD} (a measure based on random walks) and the \textbf{Community Similarity} (a measure based on belonging to a cluster in the network). \\
+
+With the current view that our data represents reviews for businesses in Pennsylvania, there are still many other subsets of the graph that we hope to explore. How do our recommenders perform on other high density regions within the data (specifically businesses in Nevada and businesses in Arizona)? Do different regions in the United States illustrate different social tendencies within Yelp usage? We hope to fully tune our system on the Pennsylvania set, and subsequently use these other sets as our test data. \\
+
+On the other hand, we hope to use this remaining research time to see how modifying our original regressions can provide more insightful data. Specifically, by having time to iterate on our K-th Nearest Neighbor (KNN) regression, we can see what heuristics better support the social nature of the Yelp data. At the moment, we are picking out all nodes that score with a similarity measure greater than 0, but it would be interesting to see how accurate our predictions would become if we slowly adjusted the threshold to be closer to 1 (max possible similarity). \\
+
+In summary, the group firmly believes that we are in a good spot but we also still believe there is a lot to explore with this particular dataset, so to conclude:
+\begin{enumerate}
+\item Compute Community Similarity
+\begin{enumerate}
+    \item Histogram
+    \item Confusion Matrix
+\end{enumerate}
+\item Compute ECTD Similarities
+\begin{enumerate}
+    \item Histogram
+    \item Confusion Matrix
+\end{enumerate}
+\item Complete evaluation and state conclusion based on final data \\ \\
+------ End of Original Proposal -----
+\item Compare and contrast different regional business cities
+\begin{enumerate}
+    \item Las Vegas
+    \item Phoenix
+\end{enumerate}
+\item Improve upon current kNN threshold (how strong does similarity need to be before we feel that we can make a prediction)
+\end{enumerate}
+
+
+\bigskip
+
+\begin{thebibliography}{}
+
+\bibitem[Anderson, A., Huttenlocher, D., Kleinberg, J., & Leskovec, J. (2012)]{leski:12}
+[1] Anderson, A., Huttenlocher, D., Kleinberg, J., \& Leskovec, J. (2012). Effects of user similarity in social media. \textit{In Proceedings of the fifth ACM international conference on Web search and data mining}, (703-712).
+
+\bibitem[Herlocker, J. L., Konstan, J. A., Terveen, L. G., & Riedl, J. T. (2004)]{herlock:05}
+[2] Herlocker, J. L., Konstan, J. A., Terveen, L. G., \& Riedl, J. T. (2004).
+\newblock Evaluating collaborative filtering recommender systems.
+\newblock \emph{ACM Transactions on Information Systems (TOIS)} \textbf{22(1)}, 5-53.
+
+\bibitem[Fouss, F., Pirotte, A., Renders, J. M., \& Saerens, M. (2007)]{foussy:01}
+[3] Fouss, F., Pirotte, A., Renders, J. M., \& Saerens, M. (2007).
+\newblock Random-walk computation of similarities between nodes of a graph with application to collaborative recommendation. Knowledge and data engineering
+\newblock \emph{IEEE transactions on}, \textbf{19(3)}, 355-369.
+
+\bibitem[Chevalier(2006)]{chev:06}
+[4] Chevalier, J, and Mayzlin, D (2006). The effect of word of mouth on sales: Online book reviews. \emph{Journal of marketing research} \textbf{43.3}, 345-354.
+APA 
+
+\bibitem[Leskovec(2010)]{lesk:10}
+[5] Leskovec, J, Huttenlocher, D, and Kleinberg, J (2010). Predicting positive and negative links in online social networks. \emph{Proceedings of the 19th international conference on World wide web.} ACM.
+
+\bibitem[Leskovec(2015)]{lesk:}
+[6] Leskovec, Jure. "Recommender Systems and Collaborative Filtering." (n.d.): n. pag. Stanford CS 246. Web. 15 Oct. 2015.
+
+\bibitem[Tan (2014)]{tan:}
+[7] Tan, Steinbach, and Kumar. "Data Mining: Data." University of Minnesota Computer Science, n.d. Web. 16 Nov. 2015.
+
+
+\end{thebibliography}{}
+
+\end{document} 
