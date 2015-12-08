@@ -30,6 +30,7 @@ def runRegressor(similarityScores, businessToRaters, predictor):
 	# Loop through each business, and predict rating by each user
 	print 'Total Businesses:', len(businessToRaters.keys())
 	counter = 1
+	possiblePredictionsCounter = 0.0
 	for businessId in businessToRaters.keys():
 		print 'Currently on business', counter
 		ratings = businessToRaters[businessId]
@@ -41,8 +42,12 @@ def runRegressor(similarityScores, businessToRaters, predictor):
 			observedValue = ratings[i][1]
 			prediction = Prediction(userId, businessId, predictedValue, observedValue)
 			predictions.append(prediction)
+			possiblePredictionsCounter = possiblePredictionsCounter + 1
 
 		counter += 1
+	print "Number of possible predictions:", possiblePredictionsCounter
+	print "Number of predictions actually made:", len(predictions)
+	print "Fraction of predictions made:", float(len(predictions))/possiblePredictionsCounter
 	return predictions
 
 def evaluateRegressor(predictions, predictor, similarityMeasure):
@@ -69,7 +74,9 @@ def evaluateRegressor(predictions, predictor, similarityMeasure):
 		roundObserved = int(round(predict.observedValue))
 		confusionMatrix[roundPredict-1, roundObserved-1] += 1
 
+
 	meanSquareError = errorSquareSum / len(predictions)
+	l2Error = math.sqrt(errorSquareSum)
 
 
 	# Print error metrics
@@ -79,6 +86,7 @@ def evaluateRegressor(predictions, predictor, similarityMeasure):
 	print 'Similarity Measure:', similarityMeasure.nameLabel
 	print 'Predictor:', predictor.nameLabel
 	print 'Mean Square Error =', meanSquareError
+	print 'L2 Error =', l2Error
 	print 'Error Histogram (prediction - observed):'
 	print 'Error', '\tCount'
 	for i in range(-4,5):

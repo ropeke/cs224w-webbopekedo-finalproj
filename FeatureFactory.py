@@ -10,22 +10,28 @@ class FeatureFactory:
 	userFeatures = dict()
 
 	def __init__(self, dataset):
-		featureList.append('BetweenessCentrality');
-		featureList.append('DegreeCentrality');
-		featureList.append('ClosenessCentrality');
+		self.featureList = list()
+		self.userFeatures = dict()
+		self.featureList.append('BetweenessCentrality');
+		self.featureList.append('DegreeCentrality');
+		self.featureList.append('ClosenessCentrality');
 
 		for userId in dataset[0].keys():
-			addUser(userId)
+			self.addUser(userId)
 
-		
+		for featureIdx in xrange(len(dataset)):
+			featureLabel = self.featureList[featureIdx]
+			featureData = dataset[featureIdx]
+			for userId in featureData.keys():
+				self.addFeature(userId, featureLabel, featureData[userId])
 
 
-	def addUser(userId):
-		userFeatures[userId] = [0]*len(featureList)
+	def addUser(self, userId):
+		self.userFeatures[userId] = [0]*len(self.featureList)
 
-	def addFeature(self, userId, featureName, value):
-		if featureName in featureList:
-			userFeatures[userId][featureIndexfeatureList().index(featureName)] = value
+	def addFeature(self,userId, featureName, value):
+		if featureName in self.featureList:
+			self.userFeatures[userId][self.featureList.index(featureName)] = value
 
 	def getFeatureMatrix(self):
-		return userFeatures
+		return self.userFeatures

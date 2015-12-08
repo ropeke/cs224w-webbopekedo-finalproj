@@ -21,10 +21,12 @@ class FeatureDistanceSimilarity:
 	# Useful for debugging/evaluation
 	nameLabel = ''
 
-	def __init__(self, featureVectors, nodeIds):
+	def __init__(self, featureVectors):
 		self.featureVectors = featureVectors
+		for user1 in self.featureVectors.keys():
+			self.similarities[user1] = list()
 		self.nameLabel = 'FeatureDistance'
-
+			
 	def loadFromFile(self):
 		"""
 		Saves calculated similarity score map to file.
@@ -37,29 +39,32 @@ class FeatureDistanceSimilarity:
 			sys.stderr.write('Try running with -buildClean = clean!\n')
 
 	def calculateSimilarities(self):
-		for user1 in featureVectors.keys():
-			for user2 in featureVectors.keys():
+		for user1 in self.featureVectors.keys():
+			for user2 in self.featureVectors.keys():
 				if user1 == user2: continue
-				vec1 = featureVectors[user1]
-				vec2 = featureVectors[user2]
-				self.similarities[user1] = (user2, cosineDistance(vec1, vec2))
+				vec1 = self.featureVectors[user1]
+				vec2 = self.featureVectors[user2]
+				self.similarities[user1].append((user2, self.cosineDistance(vec1, vec2)))
 
 		pickle.dump(self.similarities, open( "featureDistSim.p", "wb" ) )
 
-	def cosineDistance(v1, v2):
+	def cosineDistance(self, v1, v2):
 		# Normalize vectors
-		v1 = norm(v1)
-		v2 = norm(v2)
+		v1 = self.norm(v1)
+		v2 = self.norm(v2)
 		# Computer Euclidean distance
 		distance = 0.0
 		for d in xrange(len(v1)):
-			distance += math.sqrt(v1[d] - v2[d])
+			distance += math.pow(v1[d] - v2[d], 2)
 
+		distance = math.sqrt(distance)
 		return distance
 
 
-	def norm(vec):
+	def norm(self,vec):
 		normVec = list()
+		if sum(vec) == 0:
+			return vec
 		for d in xrange(len(vec)):
 			normVec.append(vec[d] / sum(vec))
 		return normVec

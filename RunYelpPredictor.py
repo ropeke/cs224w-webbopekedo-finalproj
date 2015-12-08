@@ -124,7 +124,7 @@ def main(argv):
 		similarityMeasure = PageRankSimilarity(friendshipMap)
 	elif argv[1] == 'featureDist':
 		factory = FeatureFactory((degreeCentrality, closenessCentrality, betweennessCentrality))
-		vectors = FeatureFactory.getFeatureMatrix()
+		vectors = factory.getFeatureMatrix()
 		similarityMeasure = FeatureDistanceSimilarity(vectors)
 
 	
