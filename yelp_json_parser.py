@@ -158,7 +158,7 @@ def loadFromFile():
         sys.stderr.write("I/O error({0}): {1}".format(e.errno, e.strerror)+'\n')
         sys.stderr.write('Try running with -buildClean = clean!\n')
 
-    return (friendship_map, business_reviews)
+    return (friendship_map, business_reviews, degree_centrality_map, closeness_centrality_map, betweenness_centrality_map, YGraph)
 
 
 # UPDATE by James: now called by RunYelpPredictor, returns values, separate from similarity

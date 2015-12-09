@@ -17,9 +17,11 @@ class KNNRegressor:
 
 	# Useful for debugging/evaluation
 	nameLabel = ''
+	threshold = 0.0
 
 	def __init__(self):
 		self.nameLabel = 'KNNRegressor'
+		self.threshold = 0.1
 
 	# TODO: Change so that a neighbor's vote is scaled by its similarity score
 	def predict(self, userId, businessId, similarityScores, ratings):
@@ -45,8 +47,9 @@ class KNNRegressor:
 				# Loop through all users that user A has a similarity score with
 				for i in xrange(len(similarityScores[userId])):
 					# Similar user actually rated buseiness B
-					if similarityScores[userId][i][0] == rating[0]: 
+					if similarityScores[userId][i][0] == rating[0]:
 						# Scale observed rating by similarity score
+						# if similarityScores[userId][i][1] > self.threshold
 						neighborVotes += rating[1]*similarityScores[userId][i][1]
 						relevantSimilarities += similarityScores[userId][i][1]
 

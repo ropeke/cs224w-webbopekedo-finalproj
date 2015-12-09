@@ -15,10 +15,10 @@ from CommunitySimilarity import CommunitySimilarity
 from CommuteTimeSimilarity import CommuteTimeSimilarity
 from PageRankSimilarity import PageRankSimilarity
 from FeatureDistanceSimilarity import FeatureDistanceSimilarity
-from FeatureFactory import FeatureFactory
+from FeatureFactory import *
 
 # Valid values for arguments
-similarityMeasureStrings = ['foverlap','community','commute','pagerank','featureDist']
+similarityMeasureStrings = ['foverlap','community','commute','pagerank','featureDist','all']
 predicitonModelStrings = ['baseline','knn']
 
 def printArgsHelp():
@@ -115,8 +115,6 @@ def main(argv):
 	if argv[1] == 'foverlap':
 		similarityMeasure = FriendshipOverlapSimilarity(friendshipMap)
 	elif argv[1] == 'community':
-		print "this is not breaking as of yet - testing the ability to pass the networkX graph through"
-		print type(yelpGraph)
 		similarityMeasure = CommunitySimilarity(yelpGraph)
 	elif argv[1] == 'commute':
 		similarityMeasure = CommuteTimeSimilarity()
@@ -126,6 +124,34 @@ def main(argv):
 		factory = FeatureFactory((degreeCentrality, closenessCentrality, betweennessCentrality))
 		vectors = factory.getFeatureMatrix()
 		similarityMeasure = FeatureDistanceSimilarity(vectors)
+	elif argv[1] == 'all':
+		similarityMeasure = FriendshipOverlapSimilarity(friendshipMap)
+		similarityMeasure.calculateSimilarities()
+		similarityScores = similarityMeasure.similarities
+		predictionsFOverlap = RegressorUtil.runRegressor(similarityScores, businessReviews, KNNRegressor())
+
+		similarityMeasure = CommunitySimilarity(yelpGraph)
+		similarityMeasure.calculateSimilarities()
+		similarityScores = similarityMeasure.similarities
+		predictionsCommunity = RegressorUtil.runRegressor(similarityScores, businessReviews, KNNRegressor())
+
+		similarityMeasure = PageRankSimilarity(friendshipMap)
+		similarityMeasure.calculateSimilarities()
+		similarityScores = similarityMeasure.similarities
+		predictionsPageRank = RegressorUtil.runRegressor(similarityScores, businessReviews, KNNRegressor())
+
+		factory = FeatureFactory((degreeCentrality, closenessCentrality, betweennessCentrality))
+		vectors = factory.getFeatureMatrix()
+		similarityMeasure = FeatureDistanceSimilarity(vectors)
+		similarityMeasure.calculateSimilarities()
+		similarityScores = similarityMeasure.similarities
+		predictionsFeatureDist = RegressorUtil.runRegressor(similarityScores, businessReviews, KNNRegressor())
+
+		predictions = RegressorUtil.averagePredictions((predictionsFOverlap,predictionsCommunity,predictionsPageRank,predictionsFeatureDist))
+		RegressorUtil.evaluateRegressor(predictions, 'All', 'All')
+		sys.exit(0)
+
+
 
 	
 	if buildClean:
@@ -151,7 +177,7 @@ def main(argv):
 
 	# Once all the predictions have been calculated, we evaluate the accuracy of
 	# our system and report error statistics
-	RegressorUtil.evaluateRegressor(predictions, predictionModel, similarityMeasure)
+	RegressorUtil.evaluateRegressor(predictions, predictionModel.nameLabel, similarityMeasure.nameLabel)
 
 
 if __name__ == "__main__":

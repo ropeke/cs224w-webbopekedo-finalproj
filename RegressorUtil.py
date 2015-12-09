@@ -9,6 +9,42 @@ import math
 from Prediction import Prediction
 import numpy as np
 
+def getAveragePrediction(allPredictions, businessId, userId):
+	numVotes = 0.0
+	sumVotes = 0.0
+	for predictionSet in allPredictions:
+		for prediction in predictionSet:
+			if prediction.businessId == businessId and prediction.userId == userId:
+				sumVotes = sumVotes + prediction.predictedValue
+				numVotes = numVotes + 1
+
+	if numVotes == 0: return 0
+	return sumVotes / numVotes
+
+def averagePredictions(allPredictions, businessToRaters):
+	averagePredicts = list()
+	print 'Total Businesses:', len(businessToRaters.keys())
+	counter = 1
+	possiblePredictionsCounter = 0.0
+	for businessId in businessToRaters.keys():
+		print 'Currently on business', counter
+		ratings = businessToRaters[businessId]
+		# Predict rating for each user based on similarity
+		for i in range(len(ratings)):
+			userId = ratings[i][0]
+			predictedValue = getAveragePrediction(allPredictions, businessId, userId)
+			possiblePredictionsCounter = possiblePredictionsCounter + 1
+			if predictedValue == 0: continue
+			observedValue = ratings[i][1]
+			prediction = Prediction(userId, businessId, predictedValue, observedValue)
+			predictions.append(prediction)
+
+		counter += 1
+	print "Number of possible predictions:", possiblePredictionsCounter
+	print "Number of predictions actually made:", len(predictions)
+	print "Fraction of predictions made:", float(len(predictions))/possiblePredictionsCounter
+	return predictions
+
 def runRegressor(similarityScores, businessToRaters, predictor):
 	"""
 	Runs all trials of the regressor, predicting a rating for every
@@ -37,12 +73,13 @@ def runRegressor(similarityScores, businessToRaters, predictor):
 		# Predict rating for each user based on similarity
 		for i in range(len(ratings)):
 			userId = ratings[i][0]
+			if userId not in similarityScores.keys(): continue
 			predictedValue = predictor.predict(userId, businessId, similarityScores, ratings)
+			possiblePredictionsCounter = possiblePredictionsCounter + 1
 			if predictedValue == 0: continue
 			observedValue = ratings[i][1]
 			prediction = Prediction(userId, businessId, predictedValue, observedValue)
 			predictions.append(prediction)
-			possiblePredictionsCounter = possiblePredictionsCounter + 1
 
 		counter += 1
 	print "Number of possible predictions:", possiblePredictionsCounter
@@ -50,7 +87,7 @@ def runRegressor(similarityScores, businessToRaters, predictor):
 	print "Fraction of predictions made:", float(len(predictions))/possiblePredictionsCounter
 	return predictions
 
-def evaluateRegressor(predictions, predictor, similarityMeasure):
+def evaluateRegressor(predictions, predictorLabel, similarityMeasureLabel):
 	"""
 	Evaluates the accuracy of the predictions and reports error statistics.
 
@@ -83,8 +120,8 @@ def evaluateRegressor(predictions, predictor, similarityMeasure):
 	print '###############################'
 	print '#       ERROR ANALYSIS        #'
 	print '###############################'
-	print 'Similarity Measure:', similarityMeasure.nameLabel
-	print 'Predictor:', predictor.nameLabel
+	print 'Similarity Measure:', similarityMeasureLabel
+	print 'Predictor:', predictorLabel
 	print 'Mean Square Error =', meanSquareError
 	print 'L2 Error =', l2Error
 	print 'Error Histogram (prediction - observed):'

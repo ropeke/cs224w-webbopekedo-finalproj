@@ -5,6 +5,8 @@ Author: James Webb (jmwebb@stanford.edu)
 Created: 12/5/2015
 """
 
+from Prediction import Prediction
+
 class FeatureFactory:
 	featureList = list()
 	userFeatures = dict()
@@ -12,9 +14,9 @@ class FeatureFactory:
 	def __init__(self, dataset):
 		self.featureList = list()
 		self.userFeatures = dict()
-		self.featureList.append('BetweenessCentrality');
-		self.featureList.append('DegreeCentrality');
-		self.featureList.append('ClosenessCentrality');
+		self.featureList.append('BetweenessCentrality')
+		self.featureList.append('DegreeCentrality')
+		self.featureList.append('ClosenessCentrality')
 
 		for userId in dataset[0].keys():
 			self.addUser(userId)

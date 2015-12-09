@@ -58,7 +58,7 @@ class FeatureDistanceSimilarity:
 			distance += math.pow(v1[d] - v2[d], 2)
 
 		distance = math.sqrt(distance)
-		return distance
+		return 1 - distance
 
 
 	def norm(self,vec):
