@@ -24,6 +24,7 @@ state_user_map = {}
 state_business_map = {}
 
 PRUNE_STATE = 'AZ'
+BUSNIESS_LIMIT = 3000
 
 # Number k of most similar nodes ot consider
 k = 5
